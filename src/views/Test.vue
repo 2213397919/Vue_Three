@@ -5,7 +5,7 @@
 <script>
 import * as THREE from 'three'
 import OrbitControls from 'three-orbitcontrols'
-import { OBJLoader } from 'three-obj-mtl-loader'
+import { MTLLoader, OBJLoader } from 'three-obj-mtl-loader'
 import Stats from 'stats-js'
 
 export default {
@@ -36,9 +36,9 @@ export default {
     // 相机
     initCamera () {
       this.camera = new THREE.PerspectiveCamera(
-        45,
+        100,
         window.innerWidth / window.innerHeight,
-        0.1,
+        0.2,
         1000
       )
       this.camera.position.set(0, 100, 100)
@@ -49,29 +49,36 @@ export default {
       this.scene = new THREE.Scene()
     },
     // 初始化dat.GUI简化试验流程
-    initGui () {
-      // 声明一个保存需求修改的相关数据的对象
-      this.gui = {}
-      this.datGui = new dat.GUI()
-      // 将设置属性添加到gui当中，gui.add(对象，属性，最小值，最大值）
-    },
+    // initGui () {
+    //   // 声明一个保存需求修改的相关数据的对象
+    //   this.gui = {}
+    //   this.datGui = new dat.GUI()
+    //   // 将设置属性添加到gui当中，gui.add(对象，属性，最小值，最大值）
+    // },
+    // 光点
     initLight () {
       this.scene.add(new THREE.AmbientLight(0x444444))
       this.light = new THREE.PointLight(0xffffff)
-      this.light.position.set(0, 0, 100)
+      this.light.position.set(0, 0, 500)
       // 告诉平行光需要开启阴影投射
       this.light.castShadow = true
       this.scene.add(this.light)
     },
+    // 通过第三方库加载外部文件
     initModel () {
       // 辅助工具
       // this.helper = new THREE.AxesHelper(50)
       // this.scene.add(this.helper)
       // 加载OBJ格式的模型
-      var loader = new OBJLoader()
+      var mtlLoder = new MTLLoader()
       var that = this
-      loader.load('/static/obj/a.obj', obj => {
-        that.scene.add(obj)
+      mtlLoder.load('/static/obj/2.mtl', materials => {
+        materials.preload()
+        var loader = new OBJLoader()
+        loader.setMaterials(materials)
+        loader.load('/static/obj/2.obj', obj => {
+          that.scene.add(obj)
+        })
       })
     },
 
@@ -81,7 +88,7 @@ export default {
       document.body.appendChild(this.stats.dom)
     },
 
-    // 用户交互插件 鼠标左键按住旋转，右键按住平移，滚轮缩放
+    // 用户交互插件 鼠标左键按住旋转，右键按住平移，滚轮缩放(第三方库)
     initControls () {
       this.controls = new OrbitControls(this.camera, this.renderer.domElement)
       // 如果使用animate方法时，将此函数删除
@@ -101,7 +108,7 @@ export default {
       // 是否开启右键拖拽
       this.controls.enablePan = true
     },
-
+    // 渲染在场景中
     render () {
       this.renderer.render(this.scene, this.camera)
     },
@@ -113,16 +120,16 @@ export default {
       this.render()
       this.renderer.setSize(window.innerWidth, window.innerHeight)
     },
-
+    // 动画
     animate () {
       // 更新控制器
       this.render()
       // 更新性能插件
-      // this.stats.update()
+      this.stats.update()
       this.controls.update()
       requestAnimationFrame(this.animate)
     },
-
+    // 依次调用各函数渲染。
     draw: function () {
       // this.initGui()
       this.initRender()
@@ -130,6 +137,7 @@ export default {
       this.initCamera()
       this.initLight()
       this.initModel()
+      this.render()
       this.initControls()
       this.initStats()
       this.animate()
