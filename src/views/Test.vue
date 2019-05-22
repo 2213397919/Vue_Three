@@ -74,10 +74,15 @@ export default {
       var mtlLoder = new MTLLoader()
       var that = this
       mtlLoder.load('/static/obj/2.mtl', materials => {
+        // console.log(55555, materials)
         materials.preload()
         var loader = new OBJLoader()
         loader.setMaterials(materials)
         loader.load('/static/obj/2.obj', obj => {
+          // console.log(11111, obj)
+          obj.position.y = 0
+          obj.rotation.x = 0
+          obj.scale.set(0.6, 0.6, 0.6)
           that.scene.add(obj)
         })
       })
@@ -132,7 +137,6 @@ export default {
     },
     // 依次调用各函数渲染。
     draw: function () {
-      this.initGui()
       this.initRender()
       this.initScene()
       this.initCamera()
@@ -142,6 +146,7 @@ export default {
       this.initControls()
       this.initStats()
       this.animate()
+      this.initGui()
       // window.onresize = onWindowResize
     }
   },
