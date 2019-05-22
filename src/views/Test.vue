@@ -7,6 +7,7 @@ import * as THREE from 'three'
 import OrbitControls from 'three-orbitcontrols'
 import { MTLLoader, OBJLoader } from 'three-obj-mtl-loader'
 import Stats from 'stats-js'
+import dat from 'dat.gui'
 
 export default {
   name: 'scene',
@@ -49,12 +50,12 @@ export default {
       this.scene = new THREE.Scene()
     },
     // 初始化dat.GUI简化试验流程
-    // initGui () {
-    //   // 声明一个保存需求修改的相关数据的对象
-    //   this.gui = {}
-    //   this.datGui = new dat.GUI()
-    //   // 将设置属性添加到gui当中，gui.add(对象，属性，最小值，最大值）
-    // },
+    initGui () {
+      // 声明一个保存需求修改的相关数据的对象
+      this.datGui = new dat.GUI()
+      this.datGui.add(this.camera)
+      // 将设置属性添加到gui当中，gui.add(对象，属性，最小值，最大值）
+    },
     // 光点
     initLight () {
       this.scene.add(new THREE.AmbientLight(0x444444))
@@ -131,7 +132,7 @@ export default {
     },
     // 依次调用各函数渲染。
     draw: function () {
-      // this.initGui()
+      this.initGui()
       this.initRender()
       this.initScene()
       this.initCamera()
